@@ -6,7 +6,6 @@ import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 
-//import ja.persistence.*;
 
 @Entity
 @Getter
