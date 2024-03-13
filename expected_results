@@ -1,0 +1,11 @@
+Expected Results:
+
+Alerts:
+1. Alert: User user1 conducted transactions in more than 3 distinct services within 5 minutes.
+2. Alert: User user2 conducted a transaction 5x above their average amount in the last 24 hours.
+3. Alert: User user3 is conducting ping-pong activity between services serviceB and serviceC.
+
+Flagged Users:
+1. User ID: user1 - Reason: Conducted transactions in more than 3 distinct services within 5 minutes.
+2. User ID: user2 - Reason: Conducted a transaction 5x above their average amount in the last 24 hours.
+3. User ID: user3 - Reason: Conducting ping-pong activity between services serviceB and serviceC.

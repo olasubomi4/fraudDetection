@@ -1,0 +1,16 @@
+timestamp,amount,userID,serviceID
+1617906000,150.00,user1,serviceA
+1617906060,4500.00,user2,serviceB
+1617906120,75.00,user1,serviceC
+1617906180,3000.00,user3,serviceA
+1617906240,200.00,user1,serviceB
+1617906280,120.00,user1,serviceD
+1617906300,900800.00,user2,serviceC
+1617906370,800.00,user2,serviceB
+1617906420,4900.00,user3,serviceB
+1617906480,120.00,user1,serviceD
+1618906540,5000.00,user3,serviceC
+1618906550,5000.00,user3,serviceB
+1618906590,5000.00,user3,serviceC
+1618906600,5000.00,user3,serviceB
+1618906620,5000.00,user3,serviceC
