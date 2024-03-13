@@ -12,7 +12,7 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TransactionEvent {
-//    @NotBlank(message = "Timestamp id must not be blank")
+    @NotBlank(message = "Timestamp id must not be blank")
     private Long timestamp;
     @NotBlank(message ="Amount must not be blank")
     private Double amount;

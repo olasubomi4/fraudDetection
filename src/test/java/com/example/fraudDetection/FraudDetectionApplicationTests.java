@@ -1,4 +1,4 @@
-package com.example.frauddetection;
+package com.example.fraudDetection;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
