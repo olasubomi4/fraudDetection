@@ -5,6 +5,7 @@ import com.example.fraudDetection.entity.FlaggedUser;
 import com.example.fraudDetection.entity.TransactionEvent;
 import com.example.fraudDetection.repository.IFlaggedUserRepository;
 import com.example.fraudDetection.repository.ITransactionEventRepository;
+import com.github.benmanes.caffeine.cache.Cache;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -27,6 +28,9 @@ public class FraudDetectionService implements IFraudDetectionService {
     private static final double TRANSACTION_AMOUNT_MULTIPLIER = 5.0;
     Queue<TransactionEvent> transactionEventQueue= loadQueue();
 
+    @Autowired
+    private Cache<String, FlaggedUser> flaggedUsersCache;
+
     @Override
     @Scheduled(fixedRate = 4,timeUnit = TimeUnit.SECONDS)
     public void processTransactions() {
@@ -34,7 +38,7 @@ public class FraudDetectionService implements IFraudDetectionService {
             while (!transactionEventQueue.isEmpty() && transactionEventQueue.peek().getTimestamp() <= System.currentTimeMillis()) {
                 TransactionEvent nextEvent = transactionEventQueue.poll();
 
-                FlaggedUser flaggedUser = flaggedUserRepository.findByUserId(nextEvent.getUserID());
+                FlaggedUser flaggedUser = retrieveFlaggedUsers(nextEvent.getUserID());
                 if (flaggedUser != null) {
                     log.info(flaggedUser.getFlaggedReason());
                     return;
@@ -72,7 +76,9 @@ public class FraudDetectionService implements IFraudDetectionService {
         transactionEventQueue.add(TransactionEvent.builder().timestamp(1617906120l).amount(75.00).userID("user1").serviceID("serviceC").build());
         transactionEventQueue.add(TransactionEvent.builder().timestamp(1617906180l).amount(3000.00).userID("user3").serviceID("serviceA").build());
         transactionEventQueue.add(TransactionEvent.builder().timestamp(1617906240l).amount(200.00).userID("user1").serviceID("serviceB").build());
+        transactionEventQueue.add(TransactionEvent.builder().timestamp(1617906280l).amount(120.00).userID("user1").serviceID("serviceD").build());
         transactionEventQueue.add(TransactionEvent.builder().timestamp(1617906300l).amount(900800.00).userID("user2").serviceID("serviceC").build());
+        transactionEventQueue.add(TransactionEvent.builder().timestamp(1617906370l).amount(800.00).userID("user2").serviceID("serviceB").build());
         transactionEventQueue.add(TransactionEvent.builder().timestamp(1617906420l).amount(4900.00).userID("user3").serviceID("serviceB").build());
         transactionEventQueue.add(TransactionEvent.builder().timestamp(1617906480l).amount(120.00).userID("user1").serviceID("serviceD").build());
         transactionEventQueue.add(TransactionEvent.builder().timestamp(1618906540l).amount(5000.00).userID("user3").serviceID("serviceC").build());
@@ -95,7 +101,7 @@ public class FraudDetectionService implements IFraudDetectionService {
             FlaggedUser flaggedUser= FlaggedUser.builder().userId(event.getUserID()).flaggedReason("Alert: User " +
                     event.getUserID() + " conducted transactions in more than 3 distinct services within 5 minutes.")
                     .build();
-            flaggedUserRepository.save(flaggedUser);
+            saveFlaggedUser(flaggedUser);
             log.info(flaggedUser.getFlaggedReason());
             return true;
         }
@@ -113,7 +119,7 @@ public class FraudDetectionService implements IFraudDetectionService {
             FlaggedUser flaggedUser= FlaggedUser.builder().userId(event.getUserID()).flaggedReason("Alert: User " +
                     event.getUserID() + " conducted a transaction 5x above their average amount in the last 24 hours.")
                     .build();
-            flaggedUserRepository.save(flaggedUser);
+            saveFlaggedUser(flaggedUser);
             log.info(flaggedUser.getFlaggedReason());
             return true;
         }
@@ -164,11 +170,26 @@ public class FraudDetectionService implements IFraudDetectionService {
                         " is conducting ping-pong activity between services " + service1 +
                         " and " + service2)
                 .build();
-        flaggedUserRepository.save(flaggedUser);
+        saveFlaggedUser(flaggedUser);
         log.info(flaggedUser.getFlaggedReason());
         return true;
     }
     private void update(TransactionEvent event) {
         transactionEventRepository.save(event);
+    }
+    private FlaggedUser retrieveFlaggedUsers(String userId)
+    {
+        FlaggedUser flaggedUser=null;
+        flaggedUser=flaggedUsersCache.getIfPresent(userId);
+        if(flaggedUser==null) {
+            flaggedUser = flaggedUserRepository.findByUserId(userId);
+        }
+        return flaggedUser;
+
+    }
+
+    private void saveFlaggedUser(FlaggedUser flaggedUser) {
+        flaggedUsersCache.put(flaggedUser.getUserId(),flaggedUser);
+        flaggedUserRepository.save(flaggedUser);
     }
 }
