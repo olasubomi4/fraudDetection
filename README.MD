@@ -15,7 +15,7 @@ The implementation uses Java and employs a priority queue to simulate real-time 
 
 ## Setup and Execution Instructions
 Running the Prototype
-Clone the repository and navigate to the project directory.
+Clone the repository and navigate to the project directory [https://github.com/olasubomi4/fraudDetection](https://github.com/olasubomi4/fraudDetection)
 Compile and build the project using Maven or any Java IDE.
 Run the main application class to start the fraud detection system.
 
@@ -39,4 +39,5 @@ The prototype should generate alerts and flagged users based on the predefined f
 ## Handling Out-of-Order Events
 
 To handle out-of-order events, the system maintains a priority queue of transaction events sorted by timestamp. As new events arrive, the system continuously checks the timestamps of events in the queue against the current time to ensure chronological order.
+
 
